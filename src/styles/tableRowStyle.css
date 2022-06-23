@@ -1,0 +1,35 @@
+/* #table-head {
+  display: flex;
+  justify-content: space-between;
+}
+
+#table-body {
+  display: flex;
+  justify-content: space-evenly;
+} */
+
+td {
+  padding: 0;
+
+  width: 16.7%;
+}
+
+table {
+  width: 100%;
+}
+
+#buttons {
+  display: flex;
+  justify-content: space-between;
+}
+
+#main-div {
+  padding-top: 100px;
+  text-align: center;
+  margin: auto;
+  width: 70%;
+}
+
+#searchButton {
+  height: 40px;
+}
