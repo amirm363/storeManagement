@@ -1,16 +1,16 @@
 import React, { useEffect, useState } from "react";
 import { MenuItem, Select, TextField } from "@mui/material";
-import "../styles/tableRowStyle.css";
+import "../styles/styles.css";
 
 export default function TableRowComp(props) {
   const [rowVal, setRowVal] = useState({
-    name: "",
-    catalogNum: "",
-    description: "",
-    prodType: "",
-    date: new Date(),
-    nameError: props.data.nameError,
-    catalogError: props.data.catalogError,
+    name: props?.cellValues?.name || "",
+    catalogNum: props?.cellValues?.catalogNum || "",
+    description: props?.cellValues?.description || "",
+    prodType: props?.cellValues?.prodType || "",
+    date: props?.cellValues?.date || new Date(),
+    nameError: props?.data?.nameError || false,
+    catalogError: props?.data?.catalogError || false,
   });
 
   const handleChange = (e) => {
@@ -25,9 +25,6 @@ export default function TableRowComp(props) {
         break;
 
       case e.target.name === "cell3":
-        // console.log("case 2", e.target.value);
-
-        // let stringVal = e.target.value
         let temp = e.target.value.replace(
           /\D|^[6-9][0-9]$|^5[1-9]$|...|00/g,
           e.target.value.slice(0, -1)
@@ -37,12 +34,11 @@ export default function TableRowComp(props) {
         } else {
           rowVal.catalogError = false;
         }
-        // console.log(temp);
+
         setRowVal({ ...rowVal, catalogNum: temp });
         break;
 
       case e.target.name === "cell4":
-        // console.log("case 3");
         setRowVal({ ...rowVal, description: e.target.value });
         break;
 

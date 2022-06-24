@@ -1,6 +1,6 @@
 import { Button, TextField } from "@mui/material";
 import React, { useState } from "react";
-import "../styles/tableRowStyle.css";
+import "../styles/styles.css";
 
 const SearchComp = (props) => {
   const [searchVal, setSearchVal] = useState("");

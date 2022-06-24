@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import "../styles/tableRowStyle.css";
+import "../styles/styles.css";
 import { Button } from "@mui/material";
 import Plus from "@mui/icons-material/PlusOne";
 import Save from "@mui/icons-material/SaveAltTwoTone";
@@ -16,7 +16,10 @@ export default function TableComp(props) {
     submit: true,
     saveError: true,
   });
-  const [searchedValue, setSearchedValue] = useState("");
+  const [searchedValue, setSearchedValue] = useState({
+    searchedVals: [],
+    didSearch: false,
+  });
 
   // Functions that passed as props to the child component and fetches data from it to fill cellValues.
   const getCellData = (rowVal, rowNumber) => {
@@ -33,9 +36,11 @@ export default function TableComp(props) {
 
   const searchRow = (searchedVal) => {
     if (searchedVal === "") searchedVal = undefined;
-    let tempRow = cellValues.find((row) => row.name === searchedVal);
+    let tempRow = cellValues.filter((row) => row.name.includes(searchedVal));
     console.log(tempRow);
-    tempRow ? setSearchedValue([firstRow]) : setSearchedValue("");
+    tempRow
+      ? setSearchedValue({ searchedVals: [...tempRow], didSearch: true })
+      : setSearchedValue({ searchedVals: [], didSearch: false });
   };
   //   allows to create the first row in the table
   const firstRow = {
@@ -134,18 +139,12 @@ export default function TableComp(props) {
           </tr>
         </thead>
         <tbody>
-          {searchedValue !== ""
-            ? searchedValue.map((row, index) => {
-                return <TableRowComp key={index} data={row} />;
+          {searchedValue.didSearch
+            ? searchedValue.searchedVals.map((row, index) => {
+                return <TableRowComp key={index} cellValues={row} />;
               })
             : rows.map((row, index) => {
-                return (
-                  <TableRowComp
-                    key={index}
-                    data={row}
-                    cellValues={cellValues[index]}
-                  />
-                );
+                return <TableRowComp key={index} data={row} />;
               })}
         </tbody>
       </table>
