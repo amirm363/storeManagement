@@ -141,7 +141,14 @@ export default function TableComp(props) {
         <tbody>
           {searchedValue.didSearch
             ? searchedValue.searchedVals.map((row, index) => {
-                return <TableRowComp key={index} cellValues={row} />;
+                console.log(row);
+                return (
+                  <TableRowComp
+                    key={index}
+                    data={rows[index]}
+                    cellValues={row}
+                  />
+                );
               })
             : rows.map((row, index) => {
                 return <TableRowComp key={index} data={row} />;
