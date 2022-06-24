@@ -20,9 +20,9 @@ function App() {
     <div className="App">
       {status ? (
         <div>
-          <h3>המידע נשמר בהצלחה, לחזרה לתפריט לחץ כאן</h3>
+          <h3>המידע נשמר בהצלחה, לחזרה לתפריט</h3>
           <Button variant="outlined" onClick={backToMenu}>
-            חזור
+            לחץ כאן
           </Button>
         </div>
       ) : (
@@ -37,7 +37,7 @@ function App() {
             variant="outlined"
             onClick={!abortVal ? abortFunc : () => setAbortVal(false)}
           >
-            {!abortVal ? "ביטול" : "לחזרה"}
+            {!abortVal ? "ביטול" : "לחץ כאן"}
           </Button>
         </div>
       )}

@@ -42,10 +42,10 @@ export default function TableComp(props) {
       console.log(row);
       console.log("searchedVal");
       console.log(searchedVal);
-      if (row.name === searchedVal) {
+      if (row.name.includes(searchedVal)) {
         searchedResults.push(
           <TableRowComp
-            key={row.rowNumber}
+            key={row.rowNumber - 1}
             data={row}
             setCellValues={getCellData}
           />

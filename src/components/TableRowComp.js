@@ -22,6 +22,7 @@ export default function TableRowComp(props) {
           rowVal.nameError = false;
         }
         setRowVal({ ...rowVal, name: e.target.value });
+        props?.setCellValues(rowVal, props.data.rowNumber);
         break;
 
       case e.target.name === "cell3":
@@ -36,14 +37,17 @@ export default function TableRowComp(props) {
         }
 
         setRowVal({ ...rowVal, catalogNum: temp });
+        props?.setCellValues(rowVal, props.data.rowNumber);
         break;
 
       case e.target.name === "cell4":
         setRowVal({ ...rowVal, description: e.target.value });
+        props?.setCellValues(rowVal, props.data.rowNumber);
         break;
 
       default:
         setRowVal({ ...rowVal, prodType: e.target.value });
+        props?.setCellValues(rowVal, props.data.rowNumber);
         break;
     }
   };
