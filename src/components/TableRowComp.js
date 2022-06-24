@@ -4,11 +4,11 @@ import "../styles/styles.css";
 
 export default function TableRowComp(props) {
   const [rowVal, setRowVal] = useState({
-    name: props?.cellValues?.name || "",
-    catalogNum: props?.cellValues?.catalogNum || "",
-    description: props?.cellValues?.description || "",
-    prodType: props?.cellValues?.prodType || "",
-    date: props?.cellValues?.date || new Date(),
+    name: props?.data?.name || "",
+    catalogNum: props?.data?.catalogNum || "",
+    description: props?.data?.description || "",
+    prodType: props?.data?.prodType || "",
+    date: props?.data?.date || new Date(),
     nameError: props?.data?.nameError || false,
     catalogError: props?.data?.catalogError || false,
   });
@@ -49,7 +49,7 @@ export default function TableRowComp(props) {
   };
 
   useEffect(() => {
-    props.data.setCellValues(rowVal, props.data.rowNumber);
+    props?.setCellValues(rowVal, props.data.rowNumber);
   }, [rowVal]);
 
   return (
@@ -71,7 +71,7 @@ export default function TableRowComp(props) {
           required
           onChange={handleChange}
           value={rowVal.name}
-          error={props.data.nameError || rowVal.nameError}
+          error={props.data?.nameError || rowVal.nameError}
           fullWidth
         />
       </td>
@@ -84,7 +84,7 @@ export default function TableRowComp(props) {
           fullWidth
           onChange={handleChange}
           value={rowVal?.catalogNum}
-          error={props.data.catalogError || rowVal.catalogError}
+          error={props.data?.catalogError || rowVal.catalogError}
         />
       </td>
       <td>

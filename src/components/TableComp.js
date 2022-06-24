@@ -25,6 +25,7 @@ export default function TableComp(props) {
   const getCellData = (rowVal, rowNumber) => {
     const newArr = cellValues;
     newArr[rowNumber - 1] = {
+      rowNumber: rowNumber,
       name: rowVal.name,
       catalogNum: rowVal.catalogNum,
       description: rowVal.description,
@@ -35,12 +36,30 @@ export default function TableComp(props) {
   };
 
   const searchRow = (searchedVal) => {
-    if (searchedVal === "") searchedVal = undefined;
-    let tempRow = cellValues.filter((row) => row.name.includes(searchedVal));
-    console.log(tempRow);
-    tempRow
-      ? setSearchedValue({ searchedVals: [...tempRow], didSearch: true })
-      : setSearchedValue({ searchedVals: [], didSearch: false });
+    let searchedResults = [];
+    cellValues.forEach((row) => {
+      console.log("row");
+      console.log(row);
+      console.log("searchedVal");
+      console.log(searchedVal);
+      if (row.name === searchedVal) {
+        searchedResults.push(
+          <TableRowComp
+            key={row.rowNumber}
+            data={row}
+            setCellValues={getCellData}
+          />
+        );
+      }
+    });
+    console.log(searchedResults);
+    if (searchedResults.length !== 0) {
+      console.log("HEY");
+      setSearchedValue({ searchedVals: [...searchedResults], didSearch: true });
+    } else {
+      console.log("NOT HEY");
+      setSearchedValue({ searchedVals: [], didSearch: false });
+    }
   };
   //   allows to create the first row in the table
   const firstRow = {
@@ -94,7 +113,6 @@ export default function TableComp(props) {
         return [
           ...previousRows,
           {
-            setCellValues: getCellData,
             rowNumber: rows.length + 1,
             priceError: false,
             quantityError: false,
@@ -122,6 +140,21 @@ export default function TableComp(props) {
       }
     }
   };
+
+  const renderBody = () => {
+    if (searchedValue.didSearch) {
+      return searchedValue.searchedVals.map((row, index) => {
+        console.log(row);
+        return row;
+      });
+    } else
+      return rows.map((row, index) => {
+        return (
+          <TableRowComp key={index} data={row} setCellValues={getCellData} />
+        );
+      });
+  };
+
   return (
     <div id="main-div">
       <div>
@@ -138,22 +171,7 @@ export default function TableComp(props) {
             <th>תאריך שיווק</th>
           </tr>
         </thead>
-        <tbody>
-          {searchedValue.didSearch
-            ? searchedValue.searchedVals.map((row, index) => {
-                console.log(row);
-                return (
-                  <TableRowComp
-                    key={index}
-                    data={rows[index]}
-                    cellValues={row}
-                  />
-                );
-              })
-            : rows.map((row, index) => {
-                return <TableRowComp key={index} data={row} />;
-              })}
-        </tbody>
+        <tbody>{renderBody()}</tbody>
       </table>
       <div id="buttons">
         <Button startIcon={<Plus />} size="large" onClick={addRow}>
