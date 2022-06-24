@@ -1,111 +1,66 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { MenuItem, Select, TextField } from "@mui/material";
 import "../styles/styles.css";
 
 export default function TableRowComp(props) {
-  const [rowVal, setRowVal] = useState({
-    name: props?.cellValues?.name || "",
-    catalogNum: props?.cellValues?.catalogNum || "",
-    description: props?.cellValues?.description || "",
-    prodType: props?.cellValues?.prodType || "",
-    date: props?.cellValues?.date || new Date(),
-    nameError: props?.data?.nameError || false,
-    catalogError: props?.data?.catalogError || false,
-  });
-
-  const handleChange = (e) => {
-    switch (e.target.name !== undefined) {
-      case e.target.name === "cell2":
-        if (e.target.value === "") {
-          rowVal.nameError = true;
-        } else {
-          rowVal.nameError = false;
-        }
-        setRowVal({ ...rowVal, name: e.target.value });
-        break;
-
-      case e.target.name === "cell3":
-        let temp = e.target.value.replace(
-          /\D|^[6-9][0-9]$|^5[1-9]$|...|00/g,
-          e.target.value.slice(0, -1)
-        );
-        if (temp === "") {
-          rowVal.catalogError = true;
-        } else {
-          rowVal.catalogError = false;
-        }
-
-        setRowVal({ ...rowVal, catalogNum: temp });
-        break;
-
-      case e.target.name === "cell4":
-        setRowVal({ ...rowVal, description: e.target.value });
-        break;
-
-      default:
-        setRowVal({ ...rowVal, prodType: e.target.value });
-        break;
-    }
-  };
-
-  useEffect(() => {
-    props.data.setCellValues(rowVal, props.data.rowNumber);
-  }, [rowVal]);
-
+  console.log('props ::')
+  console.log(props)
   return (
     <tr id="table-body">
       <td>
         <TextField
-          InputProps={{ readOnly: true }}
-          value={props.data.rowNumber}
+          name="rowNumber"
+          type="number"
+          value={props.data.props.data.rowNumber}
           size="small"
           fullWidth
+          InputProps={{ readOnly: true }}
         />
       </td>
       <td>
         <TextField
+          name="name"
           type="text"
-          name="cell2"
           size="small"
           inputProps={{ maxLength: 50 }}
           required
-          onChange={handleChange}
-          value={rowVal.name}
-          error={props.data.nameError || rowVal.nameError}
+          onChange={(e) => props.updateRowName(e.target.value, props.data)}
+          value={props.data.props.data.name || ''}
+          error={props.data.props.data.nameError}
           fullWidth
         />
       </td>
       <td>
         <TextField
+          name="catalogNumber"
           type="text"
-          name="cell3"
           required
           size="small"
           fullWidth
-          onChange={handleChange}
-          value={rowVal?.catalogNum}
-          error={props.data.catalogError || rowVal.catalogError}
+          onChange={(e) => props.updateRowCatalogNumber(e.target.value, props.data)}
+          value={props.data.props.data.catalogNum || ''}
+          error={props.data.props.data.catalogError}
         />
       </td>
       <td>
         <TextField
+          name="decription"
           type="text"
-          name="cell4"
           multiline
           maxRows="1"
           size="small"
-          onChange={handleChange}
+          onChange={(e) => props.updateRowDescription(e.target.value, props.data)}
           fullWidth
-          value={rowVal.description}
+          value={props.data.props.data.description || ''}
         />
       </td>
       <td>
         <Select
-          name="cell5"
+          name="prodType"
           size="small"
-          value={rowVal.prodType}
+          value={props.data.props.data.prodType}
           fullWidth
-          onChange={handleChange}
+          onChange={(e) => props.updateRowProdType(e.target.value, props.data)}
         >
           <MenuItem value={1}>ירק</MenuItem>
           <MenuItem value={2}>פרי</MenuItem>
@@ -116,9 +71,7 @@ export default function TableRowComp(props) {
         <TextField
           type="text"
           InputProps={{ readOnly: true }}
-          value={new Date(
-            rowVal.date.getTime() - 7 * 24 * 60 * 60 * 1000
-          ).toDateString()}
+          value={new Date()}
           name="cell6"
           size="small"
           fullWidth

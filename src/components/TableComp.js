@@ -4,103 +4,144 @@ import { Button } from "@mui/material";
 import Plus from "@mui/icons-material/PlusOne";
 import Save from "@mui/icons-material/SaveAltTwoTone";
 import utils from "../utils/utils";
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogTitle from '@mui/material/DialogTitle';
 
 import TableRowComp from "./TableRowComp";
 import SearchComp from "./SearchComp";
 
+const emptyRow = (rowNum) => {
+  return {
+    rowNumber: rowNum,
+    nameError: false,
+    catalogError: false,
+    prodType: -1
+  }
+}
+
 export default function TableComp(props) {
-  const [cellValues, setCellValues] = useState([]);
-  const [rows, setRows] = useState([]);
+  const updateRowName = (value, row) => {
+    let newRows = [...rows];
+    let rowToUpdate = rows[parseInt(row.key)]
+
+    rowToUpdate.props.data.name = value;
+    newRows[row.key] = rowToUpdate;
+
+    setRows(newRows);
+  }
+
+  const updateRowCatalogNumber = (value, row) => {
+    let newRows = [...rows];
+    let rowToUpdate = rows[parseInt(row.key)]
+
+    rowToUpdate.props.data.catalogNum = value;
+    newRows[row.key] = rowToUpdate;
+
+    setRows(newRows);
+  }
+
+  const updateRowDescription = (value, row) => {
+    let newRows = [...rows];
+    let rowToUpdate = rows[parseInt(row.key)]
+
+    rowToUpdate.props.data.decription = value;
+    newRows[row.key] = rowToUpdate;
+
+    setRows(newRows);
+  }
+  
+  const updateRowProdType = (value, row) => {
+    let newRows = [...rows];
+    let rowToUpdate = rows[parseInt(row.key)]
+    rowToUpdate.props.data.prodType = value;
+    newRows[row.key] = rowToUpdate;
+
+    setRows(newRows);
+  }
+
+  const [rows, setRows] = useState([
+                                    <TableRowComp
+                                      key={0}
+                                      data={emptyRow(1)}
+                                      updateRowName={updateRowName}
+                                      updateRowCatalogNumber={updateRowCatalogNumber}
+                                      updateRowDescription={updateRowDescription}
+                                      updateRowProdType={updateRowProdType}
+                                  />
+  ]);
+
+  const [filteredRows, setFilteredRows] = useState([]);
+
   const [hiddenVal, setHidden] = useState({
     blank: true,
     submit: true,
     saveError: true,
   });
-  const [searchedValue, setSearchedValue] = useState({
-    searchedVals: [],
-    didSearch: false,
-  });
 
-  // Functions that passed as props to the child component and fetches data from it to fill cellValues.
-  const getCellData = (rowVal, rowNumber) => {
-    const newArr = cellValues;
-    newArr[rowNumber - 1] = {
-      name: rowVal.name,
-      catalogNum: rowVal.catalogNum,
-      description: rowVal.description,
-      prodType: rowVal.prodType,
-      date: rowVal.date,
-    };
-    setCellValues(newArr);
-  };
+  const [modalIsOpen, setModalIsOpen] = React.useState(false);
 
   const searchRow = (searchedVal) => {
-    if (searchedVal === "") searchedVal = undefined;
-    let tempRow = cellValues.filter((row) => row.name.includes(searchedVal));
-    console.log(tempRow);
-    tempRow
-      ? setSearchedValue({ searchedVals: [...tempRow], didSearch: true })
-      : setSearchedValue({ searchedVals: [], didSearch: false });
+      let searchResults = []
+
+      rows.forEach(row => {
+        if (row.props.data.name.includes(searchedVal)) searchResults.push(row)
+      })
+      setFilteredRows(searchResults)
   };
-  //   allows to create the first row in the table
-  const firstRow = {
-    setCellValues: getCellData,
-    rowNumber: "1",
-    nameError: false,
-    catalogError: false,
-  };
-  useEffect(() => {
-    setRows([firstRow]);
-  }, []);
 
   // function that checks if any of the input fields are blank
   const addRowIsAllowed = () => {
     let flag = true;
-    cellValues.forEach((elem) => {
-      if (elem.name === "" || elem.catalogNum === "") flag = false;
+    rows.forEach((elem) => {
+      const data = elem.props.data;
+      if (!data.name || !data.catalogNum) flag = false;
     });
 
-    console.log("flag");
-    console.log(flag);
     return flag;
   };
 
   const changeErrorState = () => {
-    if (cellValues[cellValues.length - 1].name === "") {
-      const temp = rows;
-      rows.at(-1).nameError = true;
-      setRows(temp);
-    }
-    if (cellValues[cellValues.length - 1].catalogNum === "") {
-      const temp = rows;
-      rows.at(-1).catalogError = true;
-      setRows(temp);
-    }
+    let newRows = []
+    rows.forEach(row => {
+      let tempRow = row;
+      
+      if(row.props.data.name && row.props.data.catalogNum){
+        newRows.push(tempRow)
+      } else {
+        if(!row.props.data.name){
+          tempRow.props.data.nameError = true;
+        } 
+        if(!row.props.data.catalogNum){
+          tempRow.props.data.catalogError = true;
+        }
+        newRows.push(tempRow)
+      }
+    })
+
+    console.log('newRows ;:')
+    console.log(newRows)
+    setRows(newRows);
   };
 
   const addRow = () => {
-    console.log(cellValues);
     if (!addRowIsAllowed()) {
       changeErrorState();
       setHidden({ ...hiddenVal, blank: false });
     } else {
-      const temp = rows;
-      rows.at(-1).nameError = false;
-      rows.at(-1).catalogError = false;
-      setRows(temp);
-
+      let tempRows = rows;
+      tempRows.push(
+        <TableRowComp
+            key={rows.length}
+            data={emptyRow(rows.length + 1)}
+            updateRowName={updateRowName}
+            updateRowCatalogNumber={updateRowCatalogNumber}
+            updateRowDescription={updateRowDescription}
+            updateRowProdType={updateRowProdType}
+        />
+      )
+      setRows(tempRows);
       setHidden({ blank: true, submit: true, saveError: true });
-      setRows((previousRows) => {
-        return [
-          ...previousRows,
-          {
-            setCellValues: getCellData,
-            rowNumber: rows.length + 1,
-            priceError: false,
-            quantityError: false,
-          },
-        ];
-      });
     }
   };
 
@@ -113,7 +154,7 @@ export default function TableComp(props) {
       rows.at(-1).catalogError = false;
       setHidden({ ...hiddenVal, submit: true });
       try {
-        await utils.sendDataToMongo(cellValues);
+        await utils.sendDataToMongo(rows);
         props.setStatus(true);
         setHidden({ ...hiddenVal, saveError: true });
       } catch (error) {
@@ -122,8 +163,39 @@ export default function TableComp(props) {
       }
     }
   };
+
+  const renderBody = () => {
+    let activeRows = [];
+    activeRows = filteredRows.length !== 0 ? filteredRows : rows;
+    return activeRows.map((row, index) => {
+              return <TableRowComp 
+                        key={index} 
+                        data={row} 
+                        updateRowName={updateRowName}
+                        updateRowCatalogNumber={updateRowCatalogNumber}
+                        updateRowDescription={updateRowDescription}
+                        updateRowProdType={updateRowProdType}
+                      />
+            })
+  }
+
   return (
     <div id="main-div">
+      <div>
+      <Dialog
+        open={modalIsOpen}
+        onClose={() => setModalIsOpen(false)}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <DialogTitle id="alert-dialog-title">
+          {"Must Fill Search Text..."}
+        </DialogTitle>
+        <DialogActions>
+          <Button onClick={() => setModalIsOpen(false)}>OK</Button>
+        </DialogActions>
+      </Dialog>
+      </div>
       <div>
         <SearchComp setSearchedValue={searchRow} />
       </div>
@@ -139,20 +211,7 @@ export default function TableComp(props) {
           </tr>
         </thead>
         <tbody>
-          {searchedValue.didSearch
-            ? searchedValue.searchedVals.map((row, index) => {
-                console.log(row);
-                return (
-                  <TableRowComp
-                    key={index}
-                    data={rows[index]}
-                    cellValues={row}
-                  />
-                );
-              })
-            : rows.map((row, index) => {
-                return <TableRowComp key={index} data={row} />;
-              })}
+          {renderBody()}
         </tbody>
       </table>
       <div id="buttons">
