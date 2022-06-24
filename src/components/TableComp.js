@@ -3,14 +3,19 @@ import "../styles/tableRowStyle.css";
 import { Button } from "@mui/material";
 import Plus from "@mui/icons-material/PlusOne";
 import Save from "@mui/icons-material/SaveAltTwoTone";
+import utils from "../utils/utils";
 
 import TableRowComp from "./TableRowComp";
 import SearchComp from "./SearchComp";
 
-export default function TableComp() {
+export default function TableComp(props) {
   const [cellValues, setCellValues] = useState([]);
   const [rows, setRows] = useState([]);
-  const [hiddenVal, setHidden] = useState({ blank: true, submit: true });
+  const [hiddenVal, setHidden] = useState({
+    blank: true,
+    submit: true,
+    saveError: true,
+  });
   const [searchedValue, setSearchedValue] = useState("");
 
   // Functions that passed as props to the child component and fetches data from it to fill cellValues.
@@ -72,14 +77,14 @@ export default function TableComp() {
     console.log(cellValues);
     if (!addRowIsAllowed()) {
       changeErrorState();
-      console.log("INSIDE THE IF");
       setHidden({ ...hiddenVal, blank: false });
     } else {
       const temp = rows;
       rows.at(-1).nameError = false;
       rows.at(-1).catalogError = false;
       setRows(temp);
-      setHidden({ ...hiddenVal, blank: true });
+
+      setHidden({ blank: true, submit: true, saveError: true });
       setRows((previousRows) => {
         return [
           ...previousRows,
@@ -91,6 +96,25 @@ export default function TableComp() {
           },
         ];
       });
+    }
+  };
+
+  const saveToDB = async () => {
+    if (!addRowIsAllowed()) {
+      changeErrorState();
+      setHidden({ ...hiddenVal, submit: false });
+    } else {
+      rows.at(-1).nameError = false;
+      rows.at(-1).catalogError = false;
+      setHidden({ ...hiddenVal, submit: true });
+      try {
+        await utils.sendDataToMongo(cellValues);
+        props.setStatus(true);
+        setHidden({ ...hiddenVal, saveError: true });
+      } catch (error) {
+        console.log(error);
+        setHidden({ ...hiddenVal, saveError: false });
+      }
     }
   };
   return (
@@ -129,10 +153,24 @@ export default function TableComp() {
         <Button startIcon={<Plus />} size="large" onClick={addRow}>
           Add new
         </Button>
-        <Button startIcon={<Save />}>Save</Button>
+        <Button
+          startIcon={<Save />}
+          onClick={saveToDB}
+          color={
+            !hiddenVal.saveError || !hiddenVal.submit ? "error" : "primary"
+          }
+        >
+          Save
+        </Button>
       </div>
       <p hidden={hiddenVal.blank} style={{ color: "red" }}>
         לא ניתן להוסיף שורה חדשה אם אחד מהשדות: "שם מוצר" או "מק"ט" לא מלאים
+      </p>
+      <p hidden={hiddenVal.submit} style={{ color: "red" }}>
+        לא ניתן לשמור את הנתונים אם השדות המסומנים באדום ריקים
+      </p>
+      <p hidden={hiddenVal.saveError} style={{ color: "red" }}>
+        .קרתה תקלה בעת שמירת הנתונים, הנתונים לא נשמרו, אנא נסה שנית
       </p>
     </div>
   );

@@ -5,11 +5,6 @@ import "../styles/tableRowStyle.css";
 const SearchComp = (props) => {
   const [searchVal, setSearchVal] = useState("");
   const sendValueUp = () => {
-    if (window.confirm("check")) {
-      console.log("ok");
-    } else {
-      console.log("not ok");
-    }
     props.setSearchedValue(searchVal);
   };
   return (

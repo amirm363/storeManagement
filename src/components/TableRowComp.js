@@ -47,6 +47,7 @@ export default function TableRowComp(props) {
         break;
 
       default:
+        setRowVal({ ...rowVal, prodType: e.target.value });
         break;
     }
   };
