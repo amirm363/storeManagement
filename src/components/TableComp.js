@@ -94,16 +94,17 @@ export default function TableComp(props) {
   };
 
   const changeErrorState = () => {
-    if (cellValues[cellValues.length - 1].name === "") {
-      const temp = cellValues;
-      temp.at(-1).nameError = true;
-      setCellValues(temp);
-    }
-    if (cellValues[cellValues.length - 1].catalogNum === "") {
-      const temp = cellValues;
-      temp.at(-1).catalogError = true;
-      setCellValues(temp);
-    }
+    let tempArr = cellValues.map((item) => {
+      let temp = item;
+      if (item.name === "") {
+        temp.nameError = true;
+      }
+      if (item.catalogNum === "") {
+        temp.catalogError = true;
+      }
+      return temp;
+    });
+    setCellValues(tempArr);
   };
 
   const addRow = () => {
