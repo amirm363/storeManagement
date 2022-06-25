@@ -8,27 +8,31 @@ import utils from "../utils/utils";
 import TableRowComp from "./TableRowComp";
 import SearchComp from "./SearchComp";
 
+// Constant that defines a new unintialized row
 const emptyRow = {
   name: "",
   catalogNum: "",
   description: "",
   prodType: "",
-  date: "",
+  date: new Date(),
   nameError: false,
   catalogError: false,
 };
 
 export default function TableComp(props) {
+  // State that holds the data of the table rows
   const [cellValues, setCellValues] = useState([
     { ...emptyRow, rowNumber: "1" },
   ]);
-  const [rows, setRows] = useState([]);
+  // State that holds data on fields that should be visilbe or hidden dynamically
   const [hiddenVal, setHidden] = useState({
     blank: true,
     submit: true,
     saveError: true,
     notFound: true,
   });
+
+  // State that holds a new components array that it will create by the "searchRow" and a flag to know if a search already happened
   const [searchedValue, setSearchedValue] = useState({
     searchedVals: [],
     didSearch: false,
@@ -50,13 +54,11 @@ export default function TableComp(props) {
     setCellValues(newArr);
   };
 
+  // Function that passed to SearchComp to retrive the search value from the user input.
   const searchRow = (searchedVal) => {
     let searchedResults = [];
+    // Searching for the searched name value inside cellValues state and creating a new components array to render.
     cellValues.forEach((row) => {
-      console.log("row");
-      console.log(row);
-      console.log("searchedVal");
-      console.log(searchedVal);
       if (row.name.includes(searchedVal)) {
         searchedResults.push(
           <TableRowComp
@@ -67,18 +69,14 @@ export default function TableComp(props) {
         );
       }
     });
-    console.log(searchedResults);
+
     if (!searchedVal) {
-      console.log("NOOOOOT HEY");
       setSearchedValue({ searchedVals: [], didSearch: false });
       setHidden({ ...hiddenVal, notFound: true });
     } else if (searchedResults.length !== 0) {
-      console.log("HEY");
-      console.log(cellValues, searchedValue.didSearch);
       setSearchedValue({ searchedVals: [...searchedResults], didSearch: true });
       setHidden({ ...hiddenVal, notFound: true });
     } else {
-      console.log("NOT HEY");
       setHidden({ ...hiddenVal, notFound: false });
     }
   };
@@ -120,7 +118,7 @@ export default function TableComp(props) {
       temp.at(-1).catalogError = false;
       setCellValues(temp);
 
-      setHidden({ blank: true, submit: true, saveError: true });
+      setHidden({ blank: true, submit: true, saveError: true, notFound: true });
       setCellValues([
         ...cellValues,
         { ...emptyRow, rowNumber: cellValues.length + 1 },
@@ -173,42 +171,59 @@ export default function TableComp(props) {
           לא נמצאו התאמות
         </p>
       </div>
-      <table>
-        <thead>
-          <tr id="table-head">
-            <th>מספר</th>
-            <th>שם המוצר</th>
-            <th>מק"ט</th>
-            <th>תיאור המוצר</th>
-            <th>סוג המוצר</th>
-            <th>תאריך שיווק</th>
-          </tr>
-        </thead>
-        <tbody>{renderBody()}</tbody>
-      </table>
-      <div id="buttons">
-        <Button startIcon={<Plus />} size="large" onClick={addRow}>
-          Add new
-        </Button>
-        <Button
-          startIcon={<Save />}
-          onClick={saveToDB}
-          color={
-            !hiddenVal.saveError || !hiddenVal.submit ? "error" : "primary"
+      <div
+        style={
+          hiddenVal.notFound
+            ? { visibility: "visible" }
+            : { visibility: "hidden" }
+        }
+      >
+        <table>
+          <thead>
+            <tr id="table-head">
+              <th>מספר</th>
+              <th>שם המוצר</th>
+              <th>מק"ט</th>
+              <th>תיאור המוצר</th>
+              <th>סוג המוצר</th>
+              <th>תאריך שיווק</th>
+            </tr>
+          </thead>
+          <tbody>{renderBody()}</tbody>
+        </table>
+
+        <div
+          id="buttons"
+          style={
+            hiddenVal.notFound && !searchedValue.didSearch
+              ? { visibility: "visible" }
+              : { visibility: "hidden" }
           }
         >
-          Save
-        </Button>
+          <Button startIcon={<Plus />} size="large" onClick={addRow}>
+            Add new
+          </Button>
+          <Button
+            startIcon={<Save />}
+            onClick={saveToDB}
+            color={
+              !hiddenVal.saveError || !hiddenVal.submit ? "error" : "primary"
+            }
+          >
+            Save
+          </Button>
+        </div>
+
+        <p hidden={hiddenVal.blank} style={{ color: "red" }}>
+          לא ניתן להוסיף שורה חדשה אם אחד מהשדות: "שם מוצר" או "מק"ט" לא מלאים
+        </p>
+        <p hidden={hiddenVal.submit} style={{ color: "red" }}>
+          לא ניתן לשמור את הנתונים אם השדות המסומנים באדום ריקים
+        </p>
+        <p hidden={hiddenVal.saveError} style={{ color: "red" }}>
+          .קרתה תקלה בעת שמירת הנתונים, הנתונים לא נשמרו, אנא נסה שנית
+        </p>
       </div>
-      <p hidden={hiddenVal.blank} style={{ color: "red" }}>
-        לא ניתן להוסיף שורה חדשה אם אחד מהשדות: "שם מוצר" או "מק"ט" לא מלאים
-      </p>
-      <p hidden={hiddenVal.submit} style={{ color: "red" }}>
-        לא ניתן לשמור את הנתונים אם השדות המסומנים באדום ריקים
-      </p>
-      <p hidden={hiddenVal.saveError} style={{ color: "red" }}>
-        .קרתה תקלה בעת שמירת הנתונים, הנתונים לא נשמרו, אנא נסה שנית
-      </p>
     </div>
   );
 }

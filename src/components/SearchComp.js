@@ -3,25 +3,13 @@ import React, { useState } from "react";
 import "../styles/styles.css";
 
 const SearchComp = (props) => {
-  const [searchVal, setSearchVal] = useState("");
-  const sendValueUp = () => {
-    props.setSearchedValue(searchVal);
-  };
   return (
     <div>
       <TextField
         label="חיפוש"
         size="small"
-        onChange={(e) => setSearchVal(e.target.value)}
+        onChange={(e) => props.setSearchedValue(e.target.value)}
       />
-      <Button
-        variant="contained"
-        id="searchButton"
-        disableElevation
-        onClick={sendValueUp}
-      >
-        חפש
-      </Button>
     </div>
   );
 };

@@ -3,12 +3,20 @@ import { MenuItem, Select, TextField } from "@mui/material";
 import "../styles/styles.css";
 
 export default function TableRowComp(props) {
+  const lastWeekDate = () => {
+    let date = new Date(new Date().toDateString());
+    let localDate = new Date(
+      date.getTime() - 7 * 24 * 60 * 60 * 1000
+    ).toLocaleString("iw-IL");
+    return localDate.split(",")[0];
+  };
+
   const [rowVal, setRowVal] = useState({
     name: props?.data?.name || "",
     catalogNum: props?.data?.catalogNum || "",
     description: props?.data?.description || "",
     prodType: props?.data?.prodType || "",
-    date: props?.data?.date || new Date(),
+    date: lastWeekDate(),
     nameError: props?.data?.nameError || false,
     catalogError: props?.data?.catalogError || false,
   });
@@ -17,9 +25,10 @@ export default function TableRowComp(props) {
     switch (e.target.name !== undefined) {
       case e.target.name === "cell2":
         if (e.target.value === "") {
-          rowVal.nameError = true;
+          props.data.nameError = true;
         } else {
-          rowVal.nameError = false;
+          console.log("NAME ERROR false");
+          props.data.nameError = false;
         }
         setRowVal({ ...rowVal, name: e.target.value });
         props?.setCellValues(rowVal, props.data.rowNumber);
@@ -27,13 +36,13 @@ export default function TableRowComp(props) {
 
       case e.target.name === "cell3":
         let temp = e.target.value.replace(
-          /\D|^[6-9][0-9]$|^5[1-9]$|...|00/g,
+          /\D|^[6-9][0-9]$|^5[1-9]$|...|00|^[0-9]\D/g,
           e.target.value.slice(0, -1)
         );
         if (temp === "") {
-          rowVal.catalogError = true;
+          props.data.catalogError = true;
         } else {
-          rowVal.catalogError = false;
+          props.data.catalogError = false;
         }
 
         setRowVal({ ...rowVal, catalogNum: temp });
@@ -75,7 +84,7 @@ export default function TableRowComp(props) {
           required
           onChange={handleChange}
           value={rowVal.name}
-          error={props.data?.nameError || rowVal.nameError}
+          error={rowVal.nameError || props.data?.nameError}
           fullWidth
         />
       </td>
@@ -120,9 +129,7 @@ export default function TableRowComp(props) {
         <TextField
           type="text"
           InputProps={{ readOnly: true }}
-          value={new Date(
-            rowVal.date.getTime() - 7 * 24 * 60 * 60 * 1000
-          ).toDateString()}
+          value={rowVal.date}
           name="cell6"
           size="small"
           fullWidth
