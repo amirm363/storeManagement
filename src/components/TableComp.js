@@ -110,10 +110,8 @@ export default function TableComp(props) {
 
   // functions that add a new row to the table
   const addRow = () => {
-    console.log(cellValues);
     // if that checks if all required inputs are filled so we can add a new row
     if (!addRowIsAllowed()) {
-      console.log("CHECKS IF HERE");
       changeErrorState();
       setHidden({ ...hiddenVal, blank: false });
     }
@@ -151,7 +149,6 @@ export default function TableComp(props) {
         props.setStatus(true);
         setHidden({ ...hiddenVal, saveError: true });
       } catch (error) {
-        console.log(error);
         setHidden({ ...hiddenVal, saveError: false });
       }
     }
@@ -162,7 +159,6 @@ export default function TableComp(props) {
     // if that checks if there been a search, so it renders the searched data
     if (searchedValue.didSearch) {
       return searchedValue.searchedVals.map((row, index) => {
-        console.log(row);
         return row;
       });
     }
