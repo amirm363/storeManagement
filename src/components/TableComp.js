@@ -169,8 +169,6 @@ export default function TableComp(props) {
     // else that renders the original table data
     else
       return cellValues.map((row, index) => {
-        console.log("cellValues ROW");
-        console.log(cellValues);
         return (
           <TableRowComp key={index} data={row} setCellValues={getCellData} />
         );
