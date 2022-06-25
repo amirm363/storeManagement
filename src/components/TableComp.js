@@ -8,13 +8,26 @@ import utils from "../utils/utils";
 import TableRowComp from "./TableRowComp";
 import SearchComp from "./SearchComp";
 
+const emptyRow = {
+  name: "",
+  catalogNum: "",
+  description: "",
+  prodType: "",
+  date: "",
+  nameError: false,
+  catalogError: false,
+};
+
 export default function TableComp(props) {
-  const [cellValues, setCellValues] = useState([]);
+  const [cellValues, setCellValues] = useState([
+    { ...emptyRow, rowNumber: "1" },
+  ]);
   const [rows, setRows] = useState([]);
   const [hiddenVal, setHidden] = useState({
     blank: true,
     submit: true,
     saveError: true,
+    notFound: true,
   });
   const [searchedValue, setSearchedValue] = useState({
     searchedVals: [],
@@ -31,6 +44,8 @@ export default function TableComp(props) {
       description: rowVal.description,
       prodType: rowVal.prodType,
       date: rowVal.date,
+      nameError: rowVal.nameError,
+      catalogError: rowVal.catalogError,
     };
     setCellValues(newArr);
   };
@@ -53,24 +68,20 @@ export default function TableComp(props) {
       }
     });
     console.log(searchedResults);
-    if (searchedResults.length !== 0) {
+    if (!searchedVal) {
+      console.log("NOOOOOT HEY");
+      setSearchedValue({ searchedVals: [], didSearch: false });
+      setHidden({ ...hiddenVal, notFound: true });
+    } else if (searchedResults.length !== 0) {
       console.log("HEY");
+      console.log(cellValues, searchedValue.didSearch);
       setSearchedValue({ searchedVals: [...searchedResults], didSearch: true });
+      setHidden({ ...hiddenVal, notFound: true });
     } else {
       console.log("NOT HEY");
-      setSearchedValue({ searchedVals: [], didSearch: false });
+      setHidden({ ...hiddenVal, notFound: false });
     }
   };
-  //   allows to create the first row in the table
-  const firstRow = {
-    setCellValues: getCellData,
-    rowNumber: "1",
-    nameError: false,
-    catalogError: false,
-  };
-  useEffect(() => {
-    setRows([firstRow]);
-  }, []);
 
   // function that checks if any of the input fields are blank
   const addRowIsAllowed = () => {
@@ -86,39 +97,34 @@ export default function TableComp(props) {
 
   const changeErrorState = () => {
     if (cellValues[cellValues.length - 1].name === "") {
-      const temp = rows;
-      rows.at(-1).nameError = true;
-      setRows(temp);
+      const temp = cellValues;
+      temp.at(-1).nameError = true;
+      setCellValues(temp);
     }
     if (cellValues[cellValues.length - 1].catalogNum === "") {
-      const temp = rows;
-      rows.at(-1).catalogError = true;
-      setRows(temp);
+      const temp = cellValues;
+      temp.at(-1).catalogError = true;
+      setCellValues(temp);
     }
   };
 
   const addRow = () => {
     console.log(cellValues);
     if (!addRowIsAllowed()) {
+      console.log("CHECKS IF HERE");
       changeErrorState();
       setHidden({ ...hiddenVal, blank: false });
     } else {
-      const temp = rows;
-      rows.at(-1).nameError = false;
-      rows.at(-1).catalogError = false;
-      setRows(temp);
+      const temp = cellValues;
+      temp.at(-1).nameError = false;
+      temp.at(-1).catalogError = false;
+      setCellValues(temp);
 
       setHidden({ blank: true, submit: true, saveError: true });
-      setRows((previousRows) => {
-        return [
-          ...previousRows,
-          {
-            rowNumber: rows.length + 1,
-            priceError: false,
-            quantityError: false,
-          },
-        ];
-      });
+      setCellValues([
+        ...cellValues,
+        { ...emptyRow, rowNumber: cellValues.length + 1 },
+      ]);
     }
   };
 
@@ -127,8 +133,10 @@ export default function TableComp(props) {
       changeErrorState();
       setHidden({ ...hiddenVal, submit: false });
     } else {
-      rows.at(-1).nameError = false;
-      rows.at(-1).catalogError = false;
+      const temp = cellValues;
+      temp.at(-1).nameError = false;
+      temp.at(-1).catalogError = false;
+      setCellValues(temp);
       setHidden({ ...hiddenVal, submit: true });
       try {
         await utils.sendDataToMongo(cellValues);
@@ -148,7 +156,9 @@ export default function TableComp(props) {
         return row;
       });
     } else
-      return rows.map((row, index) => {
+      return cellValues.map((row, index) => {
+        console.log("cellValues ROW");
+        console.log(cellValues);
         return (
           <TableRowComp key={index} data={row} setCellValues={getCellData} />
         );
@@ -159,6 +169,9 @@ export default function TableComp(props) {
     <div id="main-div">
       <div>
         <SearchComp setSearchedValue={searchRow} />
+        <p hidden={hiddenVal.notFound} style={{ color: "red" }}>
+          לא נמצאו התאמות
+        </p>
       </div>
       <table>
         <thead>
