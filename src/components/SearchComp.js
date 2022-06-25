@@ -2,6 +2,8 @@ import { Button, TextField } from "@mui/material";
 import React, { useState } from "react";
 import "../styles/styles.css";
 
+/* search component with Mui TextField comp that acts as search input,
+it send the data back to TableRowComp to be processed*/
 const SearchComp = (props) => {
   return (
     <div>

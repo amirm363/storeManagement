@@ -32,13 +32,15 @@ export default function TableComp(props) {
     notFound: true,
   });
 
-  // State that holds a new components array that it will create by the "searchRow" and a flag to know if a search already happened
+  /*State that holds a new components array that it will create by the 
+  "searchRow" and a flag to know if a search already happened */
   const [searchedValue, setSearchedValue] = useState({
     searchedVals: [],
     didSearch: false,
   });
 
-  // Functions that passed as props to the child component and fetches data from it to fill cellValues.
+  /* Functions that passed as props to the child component and 
+  fetches data from it to fill cellValues.*/
   const getCellData = (rowVal, rowNumber) => {
     const newArr = cellValues;
     newArr[rowNumber - 1] = {
@@ -54,10 +56,11 @@ export default function TableComp(props) {
     setCellValues(newArr);
   };
 
-  // Function that passed to SearchComp to retrive the search value from the user input.
+  // Function that passed to SearchComp to retrieve the search value from the user input.
   const searchRow = (searchedVal) => {
     let searchedResults = [];
-    // Searching for the searched name value inside cellValues state and creating a new components array to render.
+    /* Searching for the searched name value inside cellValues 
+    state and creating a new components array to render.*/
     cellValues.forEach((row) => {
       if (row.name.includes(searchedVal)) {
         searchedResults.push(
@@ -87,12 +90,10 @@ export default function TableComp(props) {
     cellValues.forEach((elem) => {
       if (elem.name === "" || elem.catalogNum === "") flag = false;
     });
-
-    console.log("flag");
-    console.log(flag);
     return flag;
   };
 
+  // functions that passes on every row and turn on errors flags on the required inputs
   const changeErrorState = () => {
     let tempArr = cellValues.map((item) => {
       let temp = item;
@@ -107,13 +108,17 @@ export default function TableComp(props) {
     setCellValues(tempArr);
   };
 
+  // functions that add a new row to the table
   const addRow = () => {
     console.log(cellValues);
+    // if that checks if all required inputs are filled so we can add a new row
     if (!addRowIsAllowed()) {
       console.log("CHECKS IF HERE");
       changeErrorState();
       setHidden({ ...hiddenVal, blank: false });
-    } else {
+    }
+    // else that turn off error flags on the last row and creates a new row
+    else {
       const temp = cellValues;
       temp.at(-1).nameError = false;
       temp.at(-1).catalogError = false;
@@ -127,11 +132,15 @@ export default function TableComp(props) {
     }
   };
 
+  // function with an api call that saves the table data to DB
   const saveToDB = async () => {
+    // if that checks if all the required input fields are full so we can proceed
     if (!addRowIsAllowed()) {
       changeErrorState();
       setHidden({ ...hiddenVal, submit: false });
-    } else {
+    }
+    // else that turn off inputs error flags and sending the data to the DB with try\catch block
+    else {
       const temp = cellValues;
       temp.at(-1).nameError = false;
       temp.at(-1).catalogError = false;
@@ -148,13 +157,17 @@ export default function TableComp(props) {
     }
   };
 
+  // this function renders the body of the table
   const renderBody = () => {
+    // if that checks if there been a search, so it renders the searched data
     if (searchedValue.didSearch) {
       return searchedValue.searchedVals.map((row, index) => {
         console.log(row);
         return row;
       });
-    } else
+    }
+    // else that renders the original table data
+    else
       return cellValues.map((row, index) => {
         console.log("cellValues ROW");
         console.log(cellValues);

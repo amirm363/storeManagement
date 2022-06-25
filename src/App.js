@@ -4,15 +4,18 @@ import "./App.css";
 import TableComp from "./components/TableComp";
 
 function App() {
+  // State that states if the user left the edit table page
   const [abortVal, setAbortVal] = useState(false);
+  // State that changes the buttons and what is rendered on the screen
   const [status, setStatus] = useState(false);
 
+  // function to leave the table edit page
   const abortFunc = () => {
     if (window.confirm("האם אתה בטוח שברצונך לעזוב את הדף?")) {
       setAbortVal(true);
     }
   };
-
+  //  function that allows the user go back to the table edit page after he left it
   const backToMenu = () => {
     setStatus(false);
   };

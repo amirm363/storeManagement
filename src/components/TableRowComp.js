@@ -3,6 +3,7 @@ import { MenuItem, Select, TextField } from "@mui/material";
 import "../styles/styles.css";
 
 export default function TableRowComp(props) {
+  // function that creates new Date object without hours and as IL locale date
   const lastWeekDate = () => {
     let date = new Date(new Date().toDateString());
     let localDate = new Date(
@@ -11,6 +12,7 @@ export default function TableRowComp(props) {
     return localDate.split(",")[0];
   };
 
+  //State that holds the row cells data
   const [rowVal, setRowVal] = useState({
     name: props?.data?.name || "",
     catalogNum: props?.data?.catalogNum || "",
@@ -21,13 +23,14 @@ export default function TableRowComp(props) {
     catalogError: props?.data?.catalogError || false,
   });
 
+  /* function that handle the changes that are coming from the user inputs, showing them on screen and sending them up to update cellValues*/
   const handleChange = (e) => {
+    // switch case that detects from which input the data is coming from.
     switch (e.target.name !== undefined) {
       case e.target.name === "cell2":
         if (e.target.value === "") {
           props.data.nameError = true;
         } else {
-          console.log("NAME ERROR false");
           props.data.nameError = false;
         }
         setRowVal({ ...rowVal, name: e.target.value });
@@ -35,6 +38,7 @@ export default function TableRowComp(props) {
         break;
 
       case e.target.name === "cell3":
+        // regex that doesn't allow the user set wrong input to catalogNum
         let temp = e.target.value.replace(
           /\D|^[6-9][0-9]$|^5[1-9]$|...|00|^[0-9]\D/g,
           e.target.value.slice(0, -1)
@@ -60,7 +64,7 @@ export default function TableRowComp(props) {
         break;
     }
   };
-
+  // whenever rowVal updates the useEffect send its data up to update cellValues via props
   useEffect(() => {
     props?.setCellValues(rowVal, props.data.rowNumber);
   }, [rowVal]);
@@ -84,7 +88,7 @@ export default function TableRowComp(props) {
           required
           onChange={handleChange}
           value={rowVal.name}
-          error={rowVal.nameError || props.data?.nameError}
+          error={props.data?.nameError}
           fullWidth
         />
       </td>
@@ -96,8 +100,8 @@ export default function TableRowComp(props) {
           size="small"
           fullWidth
           onChange={handleChange}
-          value={rowVal?.catalogNum}
-          error={props.data?.catalogError || rowVal.catalogError}
+          value={rowVal.catalogNum}
+          error={props.data?.catalogError}
         />
       </td>
       <td>
