@@ -1,12 +1,14 @@
 const express = require("express");
 const cors = require("cors");
 const mongoDataDal = require("./DALS/mongoDataDAL");
+const dotenv = require('dotenv')
 const app = express();
 
 require("./config/mongoConnect");
 
 app.use(express.json());
 app.use(cors());
+dotenv.config()
 
 app.get("/", (req, res) => {
   res.type("text/plain");
